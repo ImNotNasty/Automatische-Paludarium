@@ -26,6 +26,7 @@ int minuten_voederen;
 float R1 = 10000;
 float logR2, R2, T_land,T_water ,Tc_water ,Tc_land ,Tf , R3, logR3;
 float c1 = 1.009249522e-03, c2 = 2.378405444e-04, c3 = 2.019202697e-07;
+int IraPin = 3;
 
 LiquidCrystal_I2C  lcd(I2C_ADDR,En_pin,Rw_pin,Rs_pin,D4_pin,D5_pin,D6_pin,D7_pin);
 
@@ -38,6 +39,7 @@ void setup()
   lcd.home (); // go home
   myservo.attach(9);  // attaches the servo on pin 9 to the servo object 
   myservo.write(0);
+  Serial.begin(9600);
   delay(15);
 }
 void Voederen(){
@@ -60,6 +62,7 @@ void Voederen(){
     delay(15);                       // wacht 15 milliseconden tussen iedere positieverandering van 1°
   } 
 }
+//Dit displayt temperatuur van het water en landgedeelte en de tijd tot de volgende voederbeurt.
 int Temperatuursmeting_naar_LCD() {
   //T_land berekenen
   Vo = analogRead(NTC_land);
@@ -68,7 +71,6 @@ int Temperatuursmeting_naar_LCD() {
   T_land = (1.0 / (c1 + c2*logR2 + c3*logR2*logR2*logR2));
   Tc_land = T_land - 273.15;
   Tf = (Tc_land * 9.0)/ 5.0 + 32.0; 
-
   //T_water berekenen
   V1 = analogRead(NTC_water);
   R3 = R1 * (1023.0 / (float)V1 - 1.0);
@@ -89,23 +91,33 @@ int Temperatuursmeting_naar_LCD() {
   lcd.print(lcd_land);
   lcd.print("C");
   //Omzetten millis naar min
-  minuten_voederen=(millis()/
+  minuten_voederen=(millis()/3600);
   //Print tijd volgende voederbeurt op LCD
   lcd.setCursor (1,0);
-  lcd.print("Next Feed=")
-  lcd.print(
+  lcd.print("Next Feed=");
+  lcd.print(minuten_voederen);
   
   
   delay(500);            
   lcd.clear();
 return(Tc_water,Tc_land);
 }
-void licht_aandoen
+void licht_aandoen{
+  
+}
+void Temperatuursregeling{
+  if (Tc_water <= 25){
+    digitalWrite(IraLamp+10);
+  }
+   
+}
+int 
 void loop() 
 {
+while (x=0) {
 Temperatuursmeting_naar_LCD();
+
 
 }
 
-
-
+}
