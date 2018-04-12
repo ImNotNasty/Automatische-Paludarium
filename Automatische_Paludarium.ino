@@ -12,7 +12,8 @@
 #define D6_pin  6
 #define D7_pin  7
 Servo myservo;  // creëer een servo object
-int pos = 0;    // variabele om de hoek van de servomotor op te slaan 
+int pos = 0;// variabele om de hoek van de servomotor op te slaan 
+int val= 0; // variabele om de lichtsterktte van de Iralamp op te slaan 255= Max
 long FISHFEEDER = 43200000; // 12 uur tussen voederbeurten (in millis)
 long endtime; // In een long kan je meer data opslaan als bv. een int daarom gebruik ik een long aangezien we met milliseconden werken.
 long now;
@@ -26,10 +27,10 @@ int minuten_voederen;
 float R1 = 10000;
 float logR2, R2, T_land,T_water ,Tc_water ,Tc_land ,Tf , R3, logR3;
 float c1 = 1.009249522e-03, c2 = 2.378405444e-04, c3 = 2.019202697e-07;
-int IraPin = 3;
-
+long voederen_ms;
+int voederen_min;
 LiquidCrystal_I2C  lcd(I2C_ADDR,En_pin,Rw_pin,Rs_pin,D4_pin,D5_pin,D6_pin,D7_pin);
-
+int IraLamp=3;
 void setup() 
 {
   // put your setup code here, to run once:
@@ -39,31 +40,11 @@ void setup()
   lcd.home (); // go home
   myservo.attach(9);  // attaches the servo on pin 9 to the servo object 
   myservo.write(0);
-  Serial.begin(9600);
+  endtime = now + FISHFEEDER;
   delay(15);
 }
-void Voederen(){
-  now = millis(); // millis is een commando dat het aantal milliseconden sinds het opstarten van de arduino opslaat.
-  endtime = now + FISHFEEDER;
-  while(now < endtime) 
-  {
-   myservo.write(0);
-   delay(20000);
-   now = millis();   
-  }
-  for(pos = 0; pos < 90; pos += 1)  // gaat van 0 tot 90 graden
-  {                                  // in stappen van 1 graad 
-    myservo.write(pos);              // vertelt de servo om naar de hoek te gaan opgeslagen in variabele 'pos'
-    delay(15);                       // wacht 15 milliseconden tussen iedere positieverandering van 1°
-  } 
-  for(pos = 90; pos>=1; pos-=1)     // gaat van 90 tot 0 graden
-  {                                
-    myservo.write(pos);              // vertelt de servo om naar de hoek te gaan opgeslagen in variabele 'pos'
-    delay(15);                       // wacht 15 milliseconden tussen iedere positieverandering van 1°
-  } 
-}
-//Dit displayt temperatuur van het water en landgedeelte en de tijd tot de volgende voederbeurt.
 int Temperatuursmeting_naar_LCD() {
+  lcd.clear();
   //T_land berekenen
   Vo = analogRead(NTC_land);
   R2 = R1 * (1023.0 / (float)Vo - 1.0);
@@ -91,33 +72,61 @@ int Temperatuursmeting_naar_LCD() {
   lcd.print(lcd_land);
   lcd.print("C");
   //Omzetten millis naar min
-  minuten_voederen=(millis()/3600);
+  voederen_ms=FISHFEEDER-millis();
+  voederen_min=voederen_ms/60000;
   //Print tijd volgende voederbeurt op LCD
-  lcd.setCursor (1,0);
-  lcd.print("Next Feed=");
-  lcd.print(minuten_voederen);
-  
-  
-  delay(500);            
-  lcd.clear();
-return(Tc_water,Tc_land);
+  lcd.setCursor (1,1);
+  lcd.print("Next=");
+  lcd.print(voederen_min);
+  delay(500);
+  return(Tc_water,Tc_land);
+
 }
-void licht_aandoen{
+void Voederen(){
+  now = millis(); // millis is een commando dat het aantal milliseconden sinds het opstarten van de arduino opslaat.
+ 
+  if(now >= endtime) 
+  {  
   
-}
-void Temperatuursregeling{
-  if (Tc_water <= 25){
-    digitalWrite(IraLamp+10);
+  for(pos = 0; pos < 90; pos += 1)  // gaat van 0 tot 90 graden
+  {                                  // in stappen van 1 graad 
+    myservo.write(pos);              // vertelt de servo om naar de hoek te gaan opgeslagen in variabele 'pos'
+    delay(15);                       // wacht 15 milliseconden tussen iedere positieverandering van 1°
+  } 
+  for(pos = 90; pos>=1; pos-=1)     // gaat van 90 tot 0 graden
+  {                                
+    myservo.write(pos);              // vertelt de servo om naar de hoek te gaan opgeslagen in variabele 'pos'
+    delay(15);                       // wacht 15 milliseconden tussen iedere positieverandering van 1°
   }
-   
+  endtime=endtime+FISHFEEDER;
+  } 
 }
-int 
-void loop() 
-{
-while (x=0) {
+
+
+void licht_aandoen(){
+  
+}
+void Temperatuursregeling_land(){
+  
+  if(Tc_land<= Tc_water+2)
+  {
+     for(val = 0 ; val < 256; val += 5)  // zolang land niet 2°C kouder is dan water zal val toenemen (warmte van lamp dus ook)
+  {
+   analogWrite(IraLamp,val);
+   delay(500);
+  }
+    if(Tc_land<= Tc_water+5)
+   {
+     for(val = 0 ; val < 256; val -= 5)  // zolang land niet 2°C kouder is dan water zal val toenemen (warmte van lamp dus ook)
+    {
+       analogWrite(IraLamp,val);
+      delay(500);
+    }
+   }
+  }
+ 
+void loop(){
 Temperatuursmeting_naar_LCD();
-
-
-}
-
+Voederen();
+Temperatuursregeling_land();
 }
