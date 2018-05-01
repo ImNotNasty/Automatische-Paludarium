@@ -34,6 +34,8 @@ long voederen_ms;
 int voederen_min;
 LiquidCrystal_I2C  lcd(I2C_ADDR,En_pin,Rw_pin,Rs_pin,D4_pin,D5_pin,D6_pin,D7_pin);
 int IraLamp=3;
+int ldrPin = A2;
+int lichtsterkte;
 void setup() 
 {
   // put your setup code here, to run once:
@@ -102,13 +104,19 @@ void Voederen(){
     delay(15);                       // wacht 15 milliseconden tussen iedere positieverandering van 1°
   }
   endtime=endtime+FISHFEEDER;
+  voederen_min=voederen_min+720;
   } 
 }
 
 
 void licht_aandoen(){
   pinMode(uvb,OUTPUT);
+  lichtsterkte=ldrPin;
+  if(lichtsterkte<=920){
+  digitalWrite(uvb,LOW);
+}else{ 
   digitalWrite(uvb,HIGH);
+}
 }
 void Temperatuursregeling_land(){
  analogWrite(IraPin,180);
@@ -116,11 +124,10 @@ void Temperatuursregeling_land(){
 }
 
 void Temperatuursregeling_water(){
- if (Tc_water = 25){
   pinMode(water,OUTPUT);
+ if (Tc_water >= 25){
   digitalWrite(water,HIGH); 
  }else{
-  pinMode(water,OUTPUT);
   digitalWrite(water,LOW);
  }
 }
@@ -133,3 +140,4 @@ Temperatuursregeling_water();
 licht_aandoen();
 
 }
+
