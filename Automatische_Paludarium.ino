@@ -23,7 +23,7 @@ int NTC_land = 0;
 int NTC_water = 1;
 int Vo;
 int V1;
-int ledPin= 3;
+int IraPin= 3;
 int water= 12;
 int uvb= 13;
 int minuten_voederen;
@@ -111,24 +111,10 @@ void licht_aandoen(){
   digitalWrite(uvb,HIGH);
 }
 void Temperatuursregeling_land(){
-  
-  if(Tc_land<= Tc_water+2)
-  {
-     for(val = 0 ; val < 256; val += 5)  // zolang land niet 2°C kouder is dan water zal val toenemen (warmte van lamp dus ook)
-  {
-   analogWrite(IraLamp,val);
-   delay(500);
-  }
-    if(Tc_land<= Tc_water+5)
-   {
-     for(val = 0 ; val < 256; val -= 5)  // zolang land niet 5°C warmer is dan water zal val toenemen (warmte van lamp dus ook)
-    {
-       analogWrite(IraLamp,val);
-      delay(500);
-    }
-   }
-  }
+ analogWrite(IraPin,180);
+
 }
+
 void Temperatuursregeling_water(){
  if (Tc_water = 25){
   pinMode(water,OUTPUT);
@@ -140,5 +126,7 @@ void loop(){
 Temperatuursmeting_naar_LCD();
 Voederen();
 Temperatuursregeling_land();
-}
+Temperatuursregeling_water();
+licht_aandoen();
 
+}
