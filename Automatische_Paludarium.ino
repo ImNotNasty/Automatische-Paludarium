@@ -119,6 +119,9 @@ void Temperatuursregeling_water(){
  if (Tc_water = 25){
   pinMode(water,OUTPUT);
   digitalWrite(water,HIGH); 
+ }else{
+  pinMode(water,OUTPUT);
+  digitalWrite(water,LOW);
  }
 }
 
