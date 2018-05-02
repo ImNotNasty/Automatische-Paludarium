@@ -13,13 +13,13 @@
 #define D7_pin  7
 Servo myservo;  // creëer een servo object
 int pos = 0;// variabele om de hoek van de servomotor op te slaan 
-int val= 0; // variabele om de lichtsterktte van de Iralamp op te slaan 255= Max
+int val; // variabele om de lichtsterktte van de Iralamp op te slaan 255= Max
 long FISHFEEDER = 43200000; // 12 uur tussen voederbeurten (in millis)
 long endtime; // In een long kan je meer data opslaan als bv. een int daarom gebruik ik een long aangezien we met milliseconden werken.
 long now;
-long tijdmomenteel;
-long laatstetijd;
-long interval; // dit is de interval tussen de laatste tijd en de tijd momenteel 'delay'
+long tijdmomenteel=0;
+long laatstetijd=0;
+long interval=30000; // dit is de interval tussen de laatste tijd en de tijd momenteel 'delay'
 int lcd_water , lcd_land;
 int n = 1;
 int NTC_land = 0;
@@ -115,6 +115,7 @@ void Voederen(){
 void licht_aandoen(){
   pinMode(uvb,OUTPUT);
   lichtsterkte=ldrPin;
+  Serial.println(lichtsterkte);
   if(lichtsterkte<=920){
   digitalWrite(uvb,LOW);
 }else{ 
@@ -123,10 +124,12 @@ void licht_aandoen(){
 }
 void Temperatuursregeling_land(){
  tijdmomenteel=millis();
+ Serial.println(val);
  if(tijdmomenteel-laatstetijd>=interval){
-  if(Tc_land>=30){
+  if(Tc_land<=28){
     analogWrite(IraLamp,val);
     val=val+5;
+  Serial.println(val);
   }else{
     analogWrite(IraLamp,val);
     val=val-5;
@@ -137,7 +140,7 @@ void Temperatuursregeling_land(){
 
 void Temperatuursregeling_water(){
   pinMode(water,OUTPUT);
- if (Tc_water >= 25){
+ if (Tc_water <= 25){
   digitalWrite(water,HIGH); 
  }else{
   digitalWrite(water,LOW);
