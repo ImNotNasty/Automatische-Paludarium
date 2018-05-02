@@ -17,6 +17,9 @@ int val= 0; // variabele om de lichtsterktte van de Iralamp op te slaan 255= Max
 long FISHFEEDER = 43200000; // 12 uur tussen voederbeurten (in millis)
 long endtime; // In een long kan je meer data opslaan als bv. een int daarom gebruik ik een long aangezien we met milliseconden werken.
 long now;
+long tijdmomenteel;
+long laatstetijd;
+long interval; // dit is de interval tussen de laatste tijd en de tijd momenteel 'delay'
 int lcd_water , lcd_land;
 int n = 1;
 int NTC_land = 0;
@@ -119,7 +122,16 @@ void licht_aandoen(){
 }
 }
 void Temperatuursregeling_land(){
- analogWrite(IraPin,180);
+ tijdmomenteel=millis();
+ if(tijdmomenteel-laatstetijd>=interval){
+  if(Tc_land>=30){
+    analogWrite(IraLamp,val);
+    val=val+5;
+  }else{
+    analogWrite(IraLamp,val);
+    val=val-5;
+  }
+ }
 
 }
 
@@ -140,4 +152,3 @@ Temperatuursregeling_water();
 licht_aandoen();
 
 }
-
