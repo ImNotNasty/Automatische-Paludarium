@@ -114,7 +114,7 @@ void Voederen(){
 
 void licht_aandoen(){
   pinMode(uvb,OUTPUT);
-  lichtsterkte=ldrPin;
+  lichtsterkte=analogRead(ldrPin);
   Serial.println(lichtsterkte);
   if(lichtsterkte<=920){
   digitalWrite(uvb,LOW);
