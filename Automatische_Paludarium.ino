@@ -15,7 +15,8 @@ Servo myservo;  // creëer een servo object
 int pos = 0;// variabele om de hoek van de servomotor op te slaan 
 int val; // variabele om de lichtsterktte van de Iralamp op te slaan 255= Max
 long FISHFEEDER = 43200000; // 12 uur tussen voederbeurten (in millis)
-long endtime; // In een long kan je meer data opslaan als bv. een int daarom gebruik ik een long aangezien we met milliseconden werken.
+long endtime; // In een long kan je meer data opslaan als bv. 
+//een int daarom gebruik ik een long aangezien we met milliseconden werken.
 long now;
 long tijdmomenteel=0;
 long laatstetijd=0;
@@ -41,14 +42,13 @@ int ldrPin = A2;
 int lichtsterkte;
 void setup() 
 {
-  // put your setup code here, to run once:
-  lcd.begin (16,2); //  <<----- My LCD was 16x2
-  lcd.setBacklightPin(BACKLIGHT_PIN,POSITIVE); // Switch on the backlight
-  lcd.setBacklight(HIGH);
+  lcd.begin (16,2); //  Mijn scherm heeft een grootte van 16x2
+  lcd.setBacklightPin(BACKLIGHT_PIN,POSITIVE); // Zet het LCD aan
+  lcd.setBacklight(HIGH); // zet het lcd aan
   lcd.home (); // go home
-  myservo.attach(9);  // attaches the servo on pin 9 to the servo object 
+  myservo.attach(9);  // Hiermee configureer ik pin 9 als pin voor de servomotor 
   myservo.write(0);
-  endtime = now + FISHFEEDER;
+  endtime = now + FISHFEEDER; // hiermee bepaal ik om de hoeveel uur ik moet voeden
   delay(15);
 }
 int Temperatuursmeting_naar_LCD() {
@@ -91,7 +91,8 @@ int Temperatuursmeting_naar_LCD() {
 
 }
 void Voederen(){
-  now = millis(); // millis is een commando dat het aantal milliseconden sinds het opstarten van de arduino opslaat.
+  now = millis(); // millis is een commando dat het aantal 
+                 //milliseconden sinds het opstarten van de arduino opslaat.
  
   if(now >= endtime) 
   {  
@@ -113,45 +114,47 @@ void Voederen(){
 
 
 void licht_aandoen(){
-  pinMode(uvb,OUTPUT);
-  lichtsterkte=analogRead(ldrPin);
-  Serial.println(lichtsterkte);
+  pinMode(uvb,OUTPUT); // zet pin 13 als output
+  lichtsterkte=analogRead(ldrPin); // lees waarde in 
+  Serial.println(lichtsterkte); //laad deze op naar de seriële monitor (controle)
   if(lichtsterkte<=920){
-  digitalWrite(uvb,LOW);
-}else{ 
-  digitalWrite(uvb,HIGH);
+  digitalWrite(uvb,LOW); // zet de lamp uit als het donker is buiten
+  }else{ 
+  digitalWrite(uvb,HIGH); // zet de lamp uit als het licht is buiten
+  }
 }
-}
+
 void Temperatuursregeling_land(){
- tijdmomenteel=millis();
- Serial.println(val);
- if(tijdmomenteel-laatstetijd>=interval){
-  if(Tc_land<=28){
+ tijdmomenteel=millis(); //sla millis op sinds start programma ( delay )
+ if(tijdmomenteel-laatstetijd>=interval){ //ik kan niet met delay werken (houdt programma op)
+  //daarom maak ik een kunstmatige delay met bovenstaande lus
+ }
+  if(Tc_land<=28){ // Land kouder dan 28°C? verhoog het vermogen van de lamp.
     analogWrite(IraLamp,val);
     val=val+5;
+    laatstetijd=tijdmomenteel;
   Serial.println(val);
-  }else{
+  }else{ // land is wamer? verlaag het vermogen
     analogWrite(IraLamp,val);
     val=val-5;
+    laatstetijd=tijdmomenteel;
   }
  }
-
 }
 
 void Temperatuursregeling_water(){
-  pinMode(water,OUTPUT);
- if (Tc_water <= 25){
+  pinMode(water,OUTPUT); // stel digitale pin 12 in als output
+ if (Tc_water <= 25){ // water kouder dan 25°C? verwarmingselement aan
   digitalWrite(water,HIGH); 
  }else{
-  digitalWrite(water,LOW);
+  digitalWrite(water,LOW);// uit indien warmer dan 25°C
  }
 }
 
-void loop(){
+void loop(){ // dit is het 'main' programma, alle onderdelen worden hierin continu doorlopen.
 Temperatuursmeting_naar_LCD();
 Voederen();
 Temperatuursregeling_land();
 Temperatuursregeling_water();
 licht_aandoen();
-
 }
