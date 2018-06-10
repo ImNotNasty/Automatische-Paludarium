@@ -128,7 +128,6 @@ void Temperatuursregeling_land(){
  tijdmomenteel=millis(); //sla millis op sinds start programma ( delay )
  if(tijdmomenteel-laatstetijd>=interval){ //ik kan niet met delay werken (houdt programma op)
   //daarom maak ik een kunstmatige delay met bovenstaande lus
- }
   if(Tc_land<=28){ // Land kouder dan 28°C? verhoog het vermogen van de lamp.
     analogWrite(IraLamp,val);
     val=val+5;
