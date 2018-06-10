@@ -20,7 +20,7 @@ long endtime; // In een long kan je meer data opslaan als bv.
 long now;
 long tijdmomenteel=0;
 long laatstetijd=0;
-long interval=30000; // dit is de interval tussen de laatste tijd en de tijd momenteel 'delay'
+long interval=3000; // dit is de interval tussen de laatste tijd en de tijd momenteel 'delay'
 int lcd_water , lcd_land;
 int n = 1;
 int NTC_land = 0;
@@ -128,14 +128,15 @@ void Temperatuursregeling_land(){
  tijdmomenteel=millis(); //sla millis op sinds start programma ( delay )
  if(tijdmomenteel-laatstetijd>=interval){ //ik kan niet met delay werken (houdt programma op)
   //daarom maak ik een kunstmatige delay met bovenstaande lus
-  if(Tc_land<=28){ // Land kouder dan 28°C? verhoog het vermogen van de lamp.
+  val=constrain(val,0,255); // hierdoor kan 'val' niet hoger worden als waarde 255 (max. waarde)
+  if(Tc_land<=30){ // Land kouder dan 30°C? verhoog het vermogen van de lamp.
     analogWrite(IraLamp,val);
-    val=val+5;
+    val=val+3;
     laatstetijd=tijdmomenteel;
-  Serial.println(val);
-  }else{ // land is wamer? verlaag het vermogen
+   }
+   if(Tc_land>=32){ // land is wamer? verlaag het vermogen
     analogWrite(IraLamp,val);
-    val=val-5;
+    val=val-1;
     laatstetijd=tijdmomenteel;
   }
  }
